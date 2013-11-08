@@ -1,0 +1,17 @@
+{
+  "routeset": "superprofile",
+  "labels": {
+    "count": 100,
+    "persist": false
+  },
+  "segments": [
+    {
+      "days": "1111111",
+      "split": "24"
+    }
+  ],
+  "allocations": {
+    "count": 4,
+    "adrs": 3
+  }
+}
