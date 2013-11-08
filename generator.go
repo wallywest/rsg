@@ -1,26 +1,26 @@
 package main
 
-import(
-  "fmt"
-  "flag"
-  "io/ioutil"
-  "generator"
-  "time"
-  "math/rand"
+import (
+	"flag"
+	"fmt"
+	"generator"
+	"io/ioutil"
+	"math/rand"
+	"time"
 )
 
-var option_file = flag.String("options","","options json for generator")
+var option_file = flag.String("options", "", "options json for generator")
 
 func main() {
-  rand.Seed( time.Now().UTC().UnixNano())
-  flag.Parse()
-  file,e := ioutil.ReadFile(*option_file)
+	rand.Seed(time.Now().UTC().UnixNano())
+	flag.Parse()
+	file, e := ioutil.ReadFile(*option_file)
 
-  if e != nil {
-    fmt.Println("Cannot find options file")
-  }
+	if e != nil {
+		fmt.Println("Cannot find options file")
+	}
 
-  config := generator.NewGeneratorConfig(file)
+	config := generator.NewGeneratorConfig(file)
 
-  generator.Build(config)
+	generator.Build(config)
 }
