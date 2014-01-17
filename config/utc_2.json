@@ -1,0 +1,22 @@
+{
+  "routeset": "superprofile",
+  "time_zone": "UTC",
+  "labels": {
+    "count": 2,
+    "persist": false
+  },
+  "segments": [
+    {
+      "days": "0111110",
+      "split": "2"
+    },
+    {
+      "days": "1000001",
+      "split": "2"
+    }
+  ],
+  "allocations": {
+    "count": 2,
+    "adrs": 0
+  }
+}

@@ -13,12 +13,32 @@ type Allocation struct {
 }
 
 type Destination struct {
-	Destination_id int    `json:"destination_id"`
+	Destination_id int64    `json:"destination_id"`
 	Exit_type      string `json:"type"`
 }
 
+func randInt(min int, max int) int {
+  return min + rand.Intn(max-min)
+}
+
+func MakePercentages(count int) ([]int) {
+  total := 100
+  min := 0
+  i := make([]int,count)
+  for index,_ := range i {
+    if index == count -1 {
+      i[index] = total
+    } else {
+      val := randInt(min,total)
+      i[index] = val
+      total = total - val
+    }
+  }
+  return i
+}
+
 func NewAllocationCollection(count int) []*Allocation {
-	percentages := []int{30, 30, 20, 20}
+  percentages := MakePercentages(count)
 	allocations := make([]*Allocation, count)
 	for i := 0; i < count; i++ {
 		allocations[i] = NewAllocation(percentages[i])
@@ -35,8 +55,7 @@ func NewAllocation(percentage int) (a *Allocation) {
 }
 
 func NewDestination() (d Destination) {
-	id := rand.Intn(100)
-	d = Destination{Destination_id: id, Exit_type: "Destination"}
+	d = Destination{Destination_id: RandomDestination(), Exit_type: "Destination"}
 	return
 }
 

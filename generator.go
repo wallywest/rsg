@@ -3,24 +3,29 @@ package main
 import (
 	"flag"
 	"fmt"
-	"generator"
-	"io/ioutil"
 	"math/rand"
+  "github.com/jinzhu/gorm"
+  "github.com/BurntSushi/toml"
+  _ "github.com/go-sql-driver/mysql"
 	"time"
+  "generator"
+
 )
 
-var option_file = flag.String("options", "", "options json for generator")
+
+var DB gorm.DB
+var config generator.TomlConfig
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	flag.Parse()
-	file, e := ioutil.ReadFile(*option_file)
 
-	if e != nil {
-		fmt.Println("Cannot find options file")
-	}
+  if _, err := toml.DecodeFile("config/config.toml", &config); err != nil {
+    fmt.Println(err)
+    fmt.Println("Missing config.toml file")
+    return
+  }
 
-	config := generator.NewGeneratorConfig(file)
-
-	generator.Build(config)
+  generators := generator.NewGeneratorConfig(config)
+  generator.Build(config.DB,generators)
 }

@@ -1,8 +1,13 @@
 package generator
 
 import (
+  "os"
+  "log"
 	"github.com/nu7hatch/gouuid"
+  "github.com/jinzhu/gorm"
+  _ "github.com/go-sql-driver/mysql"
 	"strconv"
+  "fmt"
 )
 
 type Generator struct {
@@ -10,15 +15,37 @@ type Generator struct {
 	routeset *SuperProfile
 }
 
-func Build(c GeneratorConfig) {
-	g := NewGenerator(c)
-	g.parse()
+type DBConnection struct{
+  connection gorm.DB
+}
+
+var Connection DBConnection
+
+func Build(dbconfig Database, configs []GeneratorConfig) {
+  NewDBConnection(dbconfig)
+
+  for _,c := range configs {
+    g := NewGenerator(c)
+    g.parse()
+    g.routeset.toJSON(c.Name)
+  }
+}
+
+func NewDBConnection(config Database){
+  db, err := gorm.Open(config.Driver, config.Dsn)
+  db.SetLogger(log.New(os.Stdout, "\r\n", 0))
+  db.LogMode(true)
+  if err != nil {
+    fmt.Println("Cannot connect to DB")
+  }
+  Connection.connection = db
+  FillCache()
 }
 
 func NewGenerator(c GeneratorConfig) (g *Generator) {
-	gr := &GenericRouteSet{}
+  gr := &GenericRouteSet{TimeZone: c.TimeZone}
 	r := &SuperProfile{GenericRouteSet: gr}
-	g = &Generator{config: c, routeset: r}
+  g = &Generator{config: c, routeset: r}
 	return
 }
 
@@ -26,7 +53,6 @@ func (g *Generator) parse() {
 	g.parseLabelOptions()
 	g.parseSegments()
 	g.parseAllocations()
-	g.routeset.toJSON()
 }
 
 func (g *Generator) parseLabelOptions() {
@@ -51,6 +77,7 @@ func (g *Generator) parseAllocations() {
 
 func (g *Generator) makeLabels(value interface{}) {
 	v := int(value.(float64))
+  fmt.Printf("Making %v Vlabels\n",v)
 	labels := make([]Label, v)
 	for i := 1; i <= int(value.(float64)); i++ {
 		u, _ := uuid.NewV4()
@@ -64,6 +91,7 @@ func (g *Generator) makeSegments(value interface{}) {
 	s := value.(map[string]interface{})
 	split := s["split"].(string)
 	days := s["days"].(string)
+  fmt.Printf("Making %v Segment with split %s\n",days,split)
 	s_int, _ := strconv.Atoi(split)
 	segments := SplitRanges(s_int, days)
 	g.routeset.addSegments(segments)

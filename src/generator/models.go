@@ -3,6 +3,7 @@ package generator
 import (
 	"encoding/json"
 	"fmt"
+  "io/ioutil"
 )
 
 type Label struct {
@@ -19,6 +20,7 @@ type Segment struct {
 }
 
 type GenericRouteSet struct {
+  TimeZone    string        `json:"time_zone"`
 	Labels      []Label       `json:"labels"`
 	Segments    []Segment     `json:"segments"`
 	Allocations []*Allocation `json:"allocations"`
@@ -26,12 +28,12 @@ type GenericRouteSet struct {
 
 type SuperProfile struct {
 	*GenericRouteSet
-	Tree map[string]interface{}
+  Tree map[string]interface{} `json:"tree"`
 }
 
 type Week struct {
 	*GenericRouteSet
-	Tree map[string][]string
+  Tree map[string][]string  `json:"tree"`
 }
 
 type RouteSetInterface interface {
@@ -44,20 +46,24 @@ func (s *SuperProfile) addLabels(l []Label) {
 	s.Labels = l
 }
 
-func (s *SuperProfile) addSegments(seg []Segment) {
-	s.Segments = seg
+func (s *SuperProfile) addSegments(segs []Segment) {
+  for _,seg := range segs {
+    s.Segments = append(s.Segments,seg)
+  }
 }
 
-func (s *SuperProfile) addAllocations(a []*Allocation) {
-	s.Allocations = a
+func (s *SuperProfile) addAllocations(allocs []*Allocation) {
+  for _,alloc := range allocs {
+	  s.Allocations = append(s.Allocations,alloc)
+  }
 }
 
-func (s *SuperProfile) toJSON() {
+func (s *SuperProfile) toJSON(name string) {
 	b, err := json.MarshalIndent(s, "", " ")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(b))
+  ioutil.WriteFile("dump/"+name+".json",b,0644)
 }
 
 func (s *SuperProfile) Print() {

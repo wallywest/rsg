@@ -1,0 +1,7 @@
+[definitions]
+  [definitions.utc]
+  files = ["utc_1","utc_2","utc_3","utc_4"]
+  [definitions.est]
+[database]
+  driver = "mysql"
+  dsn = "root:@tcp/racc_dev?charset=utf8&parseTime=True"
